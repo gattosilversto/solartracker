@@ -1,0 +1,106 @@
+/
+ U ni v e r si t y : KTH Royal I n s t i t u t e o f Technology
+ Authors : Colin Lawless and Erik K a r r fel t
+ Date : 2018≠05≠17
+ Bachelor ’ s T h e si s a t ITM
+ De sc rip ti on : Arduino code f o r Sun Following Solar Panel
+/
+#i n cl u d e <Stepper .h> // Include stepper library
+c on s t i n t s t e p sP e rR e v ol u ti o n = 6 4 0 0; // Number o f s t e p s per
+revolution
+// I n i t i a l i z e the stepper li b r a r y on pins 2 through 5:
+Stepper myStepperVert ( stepsPerRevolution , 2, 3);
+Stepper myStepperHor ( stepsPerRevolution , 4 , 5);
+i n t stepCountVert = 0; // Number o f s t e p s the v e r t i c a l
+motor has taken
+i n t stepCountHor = 0; // Number o f s t e p s the h o ri z o n t al
+motor has taken
+int stepCountTemp = 0; // Temporarily saves old stepCount
+i n t horMin = 0 ; // Minimum v al u e f o r h o r i z o n t a l motor
+i n t horMax = 1 4 0 0; // Maximum v al u e f o r h o r i z o n t a l motor
+int vertMin = ≠1800; // Minimum v al u e f o r v e r t i c a l motor
+i n t vertMax = 1 8 0 0; // Maximum v al u e f o r v e r t i c a l motor
+// LDR pin c o n n e c ti o n s
+int l d rl t = 0; // Left top
+int ld r r t = 3; // Right top
+i n t l d r l d = 1; // L e f t down
+i n t l d r r d = 2; // Right down
+c on s t f l o a t r e f e r e n c e V ol t s = 5 . 0 ; // The d e f a ul t r e f e r e n c e
+on a 5≠volt board
+const int batteryPin = 5; // Battery i s connected to
+analog pin 5
+void setup ()
+{
+myStepperVert . setSpeed (10); // Sets step motor speed
+myStepperHor . setSpeed (10); // Sets step motor speed
+Serial . begin (9600);
+delay (1000); // Sets delay before start
+}
+void loop ()
+{
+i n t l t = analogRead ( l d r l t ) ; // Top l e f t
+i n t r t = analogRead ( l d r r t ) ; // Top r i g h t
+i n t l d = analogRead ( l d r l d ) ; // Down l e f t
+i n t rd = analogRead ( l d r r d ) ; // Down r i g t
+in t val = analogRead ( batteryPin ) ; // Read the value from
+the sensor
+int dtime = 10;
+int tol = 20;
+int avt = ( l t + rt ) / 2; // Average top value
+i n t avd = ( ld + rd ) / 2; // Average down v alue
+int avl = ( l t + ld ) / 2; // Average l e f t value
+int avr = ( rt + rd ) / 2; // Average right value
+int dvert = avt ≠ avd ; // Check the top /down d i f f e r e n c e
+int dhor = avl ≠ avr ; // Check the l e f t / righ t
+difference
+if (≠1 tol > dvert | | dvert > t ol ) // Check i f dvert i s
+within tolerance
+{
+stepCountTemp = stepCountHor ; // Set temp step count
+i f ( avt > avd ) // Check which i s bigger
+{
+24
+stepCountHor ≠= 96; // Change step count
+i f ( stepCountHor < horMin ) // Check min≠value
+{
+stepCountHor = horMin ;
+}
+}
+else i f ( avt < avd ) // Check which i s bigger
+{
+stepCountHor += 9 6; // Change s t e p count
+i f ( stepCountHor > horMax ) // Check max≠value
+{
+stepCountHor = horMax ;
+}
+}
+myStepperHor . step ( stepCountHor≠stepCountTemp ); // Step
+the motor
+delay ( dtime ); // Short delay
+}
+if (≠1 tol > dhor | | dhor > t ol ) // Check i f dhor i s
+within tolerance
+{
+stepCountTemp = stepCountVert ; // Set temp step count
+i f ( avl > avr ) // Check which i s bigger
+{
+stepCountVert += 9 6; // Change s t e p count
+i f ( stepCountVert > vertMax ) // Check max≠value
+{
+stepCountVert = vertMax ;
+}
+}
+else i f ( avl < avr ) // Check which i s bigger
+{
+stepCountVert ≠= 96; // Change step count
+i f ( stepCountVert < vertMin ) // Check min≠value
+{
+stepCountVert = vertMin ;
+}
+}
+myStepperVert . step ( stepCountVert≠stepCountTemp ); // Step
+the motor
+delay ( dtime ); // Short delay
+}
+delay (150); // Delay between i te r a ti on s
+}
